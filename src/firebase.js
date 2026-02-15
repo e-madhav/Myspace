@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
-// --- PASTE YOUR FIREBASE CONFIG HERE ---
 const firebaseConfig = {
   apiKey: "AIzaSyBJyTbiiyrgtKtg6j9LZESkdRSz3D3eBis",
   authDomain: "anti-social-space-6e92b.firebaseapp.com",
@@ -12,8 +12,7 @@ const firebaseConfig = {
   measurementId: "G-S89Z81TKXZ"
 };
 
-// --- INITIALIZE FIREBASE ---
 const app = initializeApp(firebaseConfig);
-
-// --- CRITICAL STEP: EXPORT THE DATABASE ---
 export const db = getFirestore(app);
+export const auth = getAuth(app);
+export const googleProvider = new GoogleAuthProvider();
