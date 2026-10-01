@@ -1,27 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { auth, googleProvider } from '../firebase';
-import { signInWithRedirect, getRedirectResult } from 'firebase/auth'; 
+import { signInWithPopup } from 'firebase/auth'; 
 import { Sparkles, AlertTriangle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
   const [errorMsg, setErrorMsg] = useState(null);
-
-  useEffect(() => {
-    // This catches the user EXACTLY when they return from the Google Redirect
-    getRedirectResult(auth)
-      .then((result) => {
-        // If successful, App.jsx handles the redirect automatically!
-      })
-      .catch((error) => {
-        // THIS is what we were missing. It will now show us the exact error.
-        console.error("Google Redirect Error:", error);
-        setErrorMsg(error.message);
-      });
-  }, []);
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
-      await signInWithRedirect(auth, googleProvider);
+      // Switched back to Popup!
+      await signInWithPopup(auth, googleProvider);
+      navigate('/dashboard'); // Go straight to dashboard on success
     } catch (error) {
       console.error("Login trigger failed", error);
       setErrorMsg(error.message);
@@ -40,7 +31,6 @@ export default function Login() {
         <h1 className="text-4xl font-black text-slate-800 tracking-tight mb-4">MySpace</h1>
         <p className="text-slate-500 font-bold mb-6 text-lg">Your mind, organized.</p>
         
-        {/* If an error happens, this red box will appear to tell us WHY */}
         {errorMsg && (
           <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-2xl flex flex-col items-center gap-2 text-red-600 text-sm font-bold">
             <AlertTriangle size={24} />
