@@ -1,21 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { auth, googleProvider } from '../firebase';
-// 1. IMPORTANT: Import signInWithRedirect instead of signInWithPopup
-import { signInWithRedirect } from 'firebase/auth'; 
-import { Sparkles } from 'lucide-react';
+import { signInWithRedirect, getRedirectResult } from 'firebase/auth'; 
+import { Sparkles, AlertTriangle } from 'lucide-react';
 
 export default function Login() {
-  
+  const [errorMsg, setErrorMsg] = useState(null);
+
+  useEffect(() => {
+    // This catches the user EXACTLY when they return from the Google Redirect
+    getRedirectResult(auth)
+      .then((result) => {
+        // If successful, App.jsx handles the redirect automatically!
+      })
+      .catch((error) => {
+        // THIS is what we were missing. It will now show us the exact error.
+        console.error("Google Redirect Error:", error);
+        setErrorMsg(error.message);
+      });
+  }, []);
+
   const handleLogin = async () => {
     try {
-      // 2. IMPORTANT: Use signInWithRedirect
       await signInWithRedirect(auth, googleProvider);
-      
-      // Note: We do NOT need navigate('/') here anymore. 
-      // The page will redirect to Google. When Google sends them back, 
-      // your App.jsx will automatically see they are logged in and load the Dashboard!
     } catch (error) {
-      console.error("Login failed", error);
+      console.error("Login trigger failed", error);
+      setErrorMsg(error.message);
     }
   };
 
@@ -29,7 +38,15 @@ export default function Login() {
         </div>
         
         <h1 className="text-4xl font-black text-slate-800 tracking-tight mb-4">MySpace</h1>
-        <p className="text-slate-500 font-bold mb-10 text-lg">Your mind, organized.</p>
+        <p className="text-slate-500 font-bold mb-6 text-lg">Your mind, organized.</p>
+        
+        {/* If an error happens, this red box will appear to tell us WHY */}
+        {errorMsg && (
+          <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-2xl flex flex-col items-center gap-2 text-red-600 text-sm font-bold">
+            <AlertTriangle size={24} />
+            <p>{errorMsg}</p>
+          </div>
+        )}
         
         <button 
           onClick={handleLogin}
